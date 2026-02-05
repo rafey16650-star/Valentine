@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>For My Favorite Person ❤️</title>
+    <style>
+        :root {
+            --pink-light: #ffcad4;
+            --pink-medium: #f4acb7;
+            --pink-dark: #9d8189;
+            --heart-red: #ff4d6d;
+            --white: #ffffff;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--pink-light);
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            text-align: center;
+        }
+
+        /* Floating Hearts Background */
+        .heart {
+            position: absolute;
+            color: var(--heart-red);
+            font-size: 20px;
+            pointer-events: none;
+            animation: float 6s linear infinite;
+            opacity: 0;
+        }
+
+        @keyframes float {
+            0% { transform: translateY(100vh) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(-10vh) rotate(360deg); opacity: 0; }
+        }
+
+        /* Main Container */
+        #container {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 2.5rem;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            max-width: 400px;
+            width: 90%;
+            z-index: 10;
+            position: relative;
+        }
+
+        h1 {
+            color: var(--heart-red);
+            margin-bottom: 1.5rem;
+            font-size: 1.8rem;
+            transition: opacity 0.5s;
+        }
+
+        .btn-group {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 20px;
+            position: relative;
+            min-height: 50px;
+        }
+
+        button {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: bold;
+            transition: transform 0.2s, background-color 0.2s;
+        }
+
+        #yes-btn {
+            background-color: var(--heart-red);
+            color: white;
+        }
+
+        #yes-btn:hover {
+            transform: scale(1.1);
+            background-color: #ff0a37;
+        }
+
+        #no-btn {
+            background-color: var(--pink-dark);
+            color: white;
+            position: absolute;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        #final-msg {
+            font-size: 1.5rem;
+            color: var(--heart-red);
+            animation: pop 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        @keyframes pop {
+            0% { transform: scale(0); }
+            100% { transform: scale(1); }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="container">
+        <div id="quiz-section">
+            <h1 id="question-text">Hi there! I have something to ask you...</h1>
+            <div class="btn-group">
+                <button id="next-btn" onclick="nextQuestion()">Next ❤️</button>
+            </div>
+        </div>
+
+        <div id="final-section" class="hidden">
+            <h1 id="final-msg">You just made my day! ❤️</h1>
+            <p>I can't wait to spend it with you!</p>
+        </div>
+    </div>
+
+    <script>
+        const questions = [
+            "Do you know how much I love you?",
+            "Do you smile when you think of me?",
+            "Are you ready for the last question?",
+            "Will you be my Valentine?"
+        ];
+
+        let currentStep = 0;
+        const questionEl = document.getElementById('question-text');
+        const nextBtn = document.getElementById('next-btn');
+        const quizSection = document.getElementById('quiz-section');
+        const finalSection = document.getElementById('final-section');
+
+        // Function to move through the introductory questions
+        function nextQuestion() {
+            if (currentStep < questions.length - 1) {
+                questionEl.style.opacity = 0;
+                setTimeout(() => {
+                    questionEl.innerText = questions[currentStep];
+                    questionEl.style.opacity = 1;
+                    currentStep++;
+                    
+                    // If it's the final question, swap buttons
+                    if (currentStep === questions.length) {
+                        setupFinalQuestion();
+                    }
+                }, 400);
+            } else {
+                setupFinalQuestion();
+            }
+        }
+
+        function setupFinalQuestion() {
+            questionEl.innerText = questions[questions.length - 1];
+            
+            // Clear buttons and add Yes/No
+            const btnGroup = document.querySelector('.btn-group');
+            btnGroup.innerHTML = `
+                <button id="yes-btn" onclick="celebrate()">Yes</button>
+                <button id="no-btn">No</button>
+            `;
+
+            const noBtn = document.getElementById('no-btn');
+            
+            // Logic to move the No button
+            const moveButton = () => {
+                const x = Math.random() * (window.innerWidth - noBtn.offsetWidth - 20);
+                const y = Math.random() * (window.innerHeight - noBtn.offsetHeight - 20);
+                
+                noBtn.style.position = 'fixed';
+                noBtn.style.left = x + 'px';
+                noBtn.style.top = y + 'px';
+            };
+
+            noBtn.addEventListener('mouseover', moveButton);
+            noBtn.addEventListener('touchstart', (e) => {
+                e.preventDefault(); // Prevent accidental clicks on mobile
+                moveButton();
+            });
+        }
+
+        function celebrate() {
+            quizSection.classList.add('hidden');
+            finalSection.classList.remove('hidden');
+            createHearts();
+        }
+
+        // Background Animation Logic
+        function createHearts() {
+            for (let i = 0; i < 50; i++) {
+                setTimeout(() => {
+                    const heart = document.createElement('div');
+                    heart.classList.add('heart');
+                    heart.innerHTML = '❤️';
+                    heart.style.left = Math.random() * 100 + 'vw';
+                    heart.style.animationDuration = (Math.random() * 3 + 3) + 's';
+                    document.body.appendChild(heart);
+                    
+                    setTimeout(() => heart.remove(), 6000);
+                }, i * 100);
+            }
+        }
+
+        // Initialize some gentle background hearts
+        setInterval(() => {
+            const heart = document.createElement('div');
+            heart.classList.add('heart');
+            heart.innerHTML = '🌸';
+            heart.style.left = Math.random() * 100 + 'vw';
+            heart.style.fontSize = '15px';
+            heart.style.animationDuration = '8s';
+            document.body.appendChild(heart);
+            setTimeout(() => heart.remove(), 8000);
+        }, 1000);
+    </script>
+</body>
+</html>
+``` Would you like me to help you host this code on a platform like GitHub Pages so you can send the link to your Valentine?
